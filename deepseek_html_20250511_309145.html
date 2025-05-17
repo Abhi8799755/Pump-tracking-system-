@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pump Processing Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --primary-dark: #3a0ca3;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f72585;
+            --light: #f8f9fa;
+            --light-gray: #e9ecef;
+            --medium-gray: #ced4da;
+            --dark-gray: #6c757d;
+            --dark: #212529;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark);
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
+        }
+        
+        .app-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .app-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .app-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .app-subtitle {
+            font-size: 16px;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--light-gray);
+            padding: 0 20px;
+        }
+        
+        .nav-tab {
+            padding: 18px 30px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--dark-gray);
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-tab i {
+            font-size: 18px;
+        }
+        
+        .nav-tab.active, .nav-tab:hover {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-panel {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+        
+        .panel-title {
+            margin-bottom: 25px;
+            color: var(--primary-dark);
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-title i {
+            color: var(--primary);
+        }
+        
+        .form-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .form-row {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .form-label {
+            width: 220px;
+            font-weight: 500;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-label i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
+        }
+        
+        .form-control {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 6px;
+            font-size: 15px;
+            transition: var(--transition);
+            background-color: var(--light);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn i {
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: var(--dark);
+        }
+        
+        .btn-success:hover {
+            background-color: #3aa8d4;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e07c0c;
+            transform: translateY(-2px);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .data-table th {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: var(--light);
+        }
+        
+        .data-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-badge i {
+            font-size: 10px;
+        }
+        
+        .status-pending {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-completed {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .status-loading {
+            background-color: rgba(114, 9, 183, 0.1);
+            color: var(--secondary);
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: translateY(0);
+            transition: var(--transition);
+        }
+        
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--light-gray);
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-title i {
+            font-size: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--white);
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--dark-gray);
+            font-size: 14px;
+            border-top: 1px solid var(--light-gray);
+            background-color: var(--light);
+        }
+        
+        .stage-form {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: var(--light);
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+        }
+        
+        .parts-checklist {
+            margin: 15px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background-color: var(--white);
+            border-radius: 6px;
+            border: 1px solid var(--light-gray);
+            transition: var(--transition);
+        }
+        
+        .checklist-item:hover {
+            border-color: var(--primary);
+        }
+        
+        .checklist-item input {
+            accent-color: var(--primary);
+        }
+        
+        .operator-log {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--light);
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 10px;
+            padding: 12px;
+            background-color: var(--white);
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .log-entry strong {
+            color: var(--primary-dark);
+        }
+        
+        .stage-details {
+            margin-top: 20px;
+        }
+        
+        .stage-details p {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: var(--light);
+            border-radius: 6px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .stat-card h3 {
+            font-size: 28px;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+        
+        .progress-container {
+            margin-top: 30px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--dark-gray);
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 6px;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: var(--light-gray);
+            color: var(--dark);
+        }
+        
+        .badge-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1100;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification-success {
+            background-color: var(--success);
+        }
+        
+        .notification-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+        
+        .pump-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .stage-card {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: var(--light);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stage-card h5 {
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .report-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .report-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            padding: 15px;
+            background-color: var(--light);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .summary-card h4 {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .empty-state {
+            padding: 30px;
+            text-align: center;
+            color: var(--dark-gray);
+        }
+        
+        .pump-supervisor-card {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: var(--light);
+            border-radius: 8px;
+        }
+        
+        .pump-supervisor-card .pump-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .time-info {
+            margin-bottom: 15px;
+        }
+        
+        .divider {
+            border: none;
+            height: 1px;
+            background-color: var(--light-gray);
+            margin: 20px 0;
+        }
+        
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .version {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .app-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+                padding: 0;
+            }
+            
+            .nav-tab {
+                flex: 1 0 100%;
+                text-align: center;
+                border-bottom: 1px solid var(--light-gray);
+                padding: 12px;
+                justify-content: center;
+                font-size: 14px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+            
+            .form-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .action-btns {
+                flex-direction: row;
+                gap: 5px;
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                width: auto;
+                justify-content: center;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .parts-checklist {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .data-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .data-table th, 
+            .data-table td {
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                max-height: 85vh;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .form-card {
+                padding: 15px;
+            }
+            
+            .tab-panel {
+                padding: 15px;
+            }
+            
+            .panel-title {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .progress-labels {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .progress-labels span {
+                font-size: 11px;
+            }
+
+            /* Better mobile form controls */
+            input[type="text"],
+            input[type="datetime-local"],
+            input[type="date"],
+            textarea,
+            select {
+                width: 100% !important;
+            }
+            
+            /* Stack date and button in reports */
+            .form-row > input[type="date"] {
+                margin-left: 0 !important;
+                margin-bottom: 10px;
+            }
+            
+            /* Make status badges wrap */
+            .status-badge {
+                white-space: normal;
+                display: inline-flex;
+            }
+
+            /* Mobile table styles */
+            .mobile-table {
+                display: block;
+                width: 100%;
+            }
+            
+            .mobile-table thead {
+                display: none;
+            }
+            
+            .mobile-table tbody {
+                display: block;
+                width: 100%;
+            }
+            
+            .mobile-table tr {
+                display: block;
+                margin-bottom: 15px;
+                border: 1px solid var(--light-gray);
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            
+            .mobile-table td {
+                display: block;
+                text-align: right;
+                padding: 8px 15px;
+                position: relative;
+                white-space: normal;
+            }
+            
+            .mobile-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                top: 8px;
+                font-weight: 500;
+                color: var(--primary-dark);
+            }
+            
+            .mobile-table .action-btns {
+                justify-content: flex-end;
+            }
+        }
+
+        /* Prevent zooming on input focus on mobile */
+        @media screen and (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">Pump Processing Tracker</h1>
+            <p class="app-subtitle">Track and manage pump processing workflow</p>
+        </header>
+        
+        <nav class="nav-tabs">
+            <div class="nav-tab active" data-tab="entry">
+                <i class="fas fa-plus-circle"></i>
+                New Entry
+            </div>
+            <div class="nav-tab" data-tab="tracking">
+                <i class="fas fa-tasks"></i>
+                Tracking
+            </div>
+            <div class="nav-tab" data-tab="reports">
+                <i class="fas fa-chart-bar"></i>
+                Reports
+            </div>
+            <div class="nav-tab" data-tab="supervisor">
+                <i class="fas fa-user-shield"></i>
+                Supervisor
+            </div>
+        </nav>
+        
+        <main>
+            <div id="entry" class="tab-panel active">
+                <h2 class="panel-title">
+                    <i class="fas fa-plus-circle"></i>
+                    New Pump Entry
+                </h2>
+                
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <i class="fas fa-pump-soap"></i>
+                        <h3 id="total-pumps">0</h3>
+                        <p>Total Pumps</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-spinner"></i>
+                        <h3 id="in-progress">0</h3>
+                        <p>In Progress</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle"></i>
+                        <h3 id="completed-pumps">0</h3>
+                        <p>Completed</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <h3 id="avg-time">0</h3>
+                        <p>Avg Time (hrs)</p>
+                    </div>
+                </div>
+                
+                <div class="form-card">
+                    <div class="form-row">
+                        <label class="form-label" for="pump-id">
+                            <i class="fas fa-barcode"></i>
+                            Pump ID/Number
+                        </label>
+                        <input type="text" class="form-control" id="pump-id" placeholder="Enter pump identification">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label" for="pump-type">
+                            <i class="fas fa-cog"></i>
+                            Pump Type
+                        </label>
+                        <input type="text" class="form-control" id="pump-type" placeholder="Enter pump type/model">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label" for="received-time">
+                            <i class="fas fa-calendar-alt"></i>
+                            Received at Loading Point
+                        </label>
+                        <input type="datetime-local" class="form-control" id="received-time">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label" for="received-by">
+                            <i class="fas fa-user"></i>
+                            Received By
+                        </label>
+                        <input type="text" class="form-control" id="received-by" placeholder="Operator name">
+                    </div>
+                    <div class="form-row">
+                        <div style="width: 220px;"></div>
+                        <button class="btn btn-primary" onclick="addNewPump()">
+                            <i class="fas fa-save"></i>
+                            Add New Pump
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tracking" class="tab-panel">
+                <h2 class="panel-title">
+                    <i class="fas fa-tasks"></i>
+                    Pump Tracking
+                </h2>
+                
+                <div class="search-container">
+                    <input type="text" class="search-input" id="search-pump" placeholder="Search by Pump ID or Type...">
+                    <button class="btn btn-primary" onclick="searchPumps()">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+                
+                <div class="form-card">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-labels">
+                            <span>Loading</span>
+                            <span>Dismantling</span>
+                            <span>Machine Shop</span>
+                            <span>Reassembly</span>
+                            <span>Alignment</span>
+                            <span>Completed</span>
+                        </div>
+                    </div>
+                    
+                    <table class="data-table" id="pump-table">
+                        <thead>
+                            <tr>
+                                <th>Pump ID</th>
+                                <th>Type</th>
+                                <th>Current Stage</th>
+                                <th>Stage Start</th>
+                                <th>Time Taken</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pump-data">
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="reports" class="tab-panel">
+                <h2 class="panel-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Processing Reports
+                </h2>
+                
+                <div class="form-card">
+                    <div class="form-row">
+                        <label class="form-label" for="report-date">
+                            <i class="fas fa-calendar-day"></i>
+                            Select Date
+                        </label>
+                        <input type="date" class="form-control" id="report-date" style="width: 200px;">
+                        <button class="btn btn-primary" onclick="generateReport()" style="margin-left: 15px;">
+                            <i class="fas fa-file-export"></i>
+                            Generate Report
+                        </button>
+                    </div>
+                    <div id="report-results" style="margin-top: 20px;">
+                        <!-- Report data will appear here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div id="supervisor" class="tab-panel">
+                <h2 class="panel-title">
+                    <i class="fas fa-user-shield"></i>
+                    Supervisor View
+                </h2>
+                
+                <div class="form-card">
+                    <div class="form-row">
+                        <label class="form-label" for="supervisor-date">
+                            <i class="fas fa-calendar-day"></i>
+                            Select Date
+                        </label>
+                        <input type="date" class="form-control" id="supervisor-date" style="width: 200px;">
+                        <button class="btn btn-primary" onclick="loadSupervisorView()" style="margin-left: 15px;">
+                            <i class="fas fa-sync-alt"></i>
+                            Load Data
+                        </button>
+                    </div>
+                    <div id="supervisor-results" style="margin-top: 20px;">
+                        <!-- Supervisor data will appear here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="footer">
+            <p>&copy; 2025 Pump Tracking System. All rights reserved.</p>
+            <p class="version">Version 2.0.0</p>
+        </footer>
+    </div>
+
+    <!-- Modal Dialog -->
+    <div id="stage-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">
+                    <i class="fas fa-info-circle"></i>
+                    Stage Details
+                </h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <!-- Content will be filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data storage (in a real app, this would be a database)
+        let pumps = [];
+        let currentPumpIndex = null;
+        
+        // Tab functionality
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and panels
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding panel
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Update stats when switching to entry tab
+                if (tabId === 'entry') {
+                    updateStats();
+                }
+                
+                // Update progress bar when switching to tracking tab
+                if (tabId === 'tracking') {
+                    updateProgressBar();
+                }
+            });
+        });
+
+        // Modal functions
+        function openModal() {
+            document.getElementById('stage-modal').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('stage-modal').classList.add('show');
+            }, 10);
+        }
+        
+        function closeModal() {
+            document.getElementById('stage-modal').classList.remove('show');
+            setTimeout(() => {
+                document.getElementById('stage-modal').style.display = 'none';
+            }, 300);
+        }
+        
+        // Add new pump to the system
+        function addNewPump() {
+            const pumpId = document.getElementById('pump-id').value;
+            const pumpType = document.getElementById('pump-type').value;
+            const receivedTime = document.getElementById('received-time').value;
+            const receivedBy = document.getElementById('received-by').value;
+            
+            if (!pumpId || !pumpType || !receivedTime || !receivedBy) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const newPump = {
+                id: pumpId,
+                type: pumpType,
+                receivedAt: new Date(receivedTime),
+                currentStage: 'Loading Point',
+                stageStartTime: new Date(receivedTime),
+                receivedBy: receivedBy,
+                stages: {
+                    loading: { 
+                        start: new Date(receivedTime), 
+                        end: null, 
+                        operator: receivedBy,
+                        notes: 'Pump received at loading point'
+                    },
+                    dismantling: { 
+                        start: null, 
+                        end: null, 
+                        operator: null,
+                        partsToCut: [],
+                        disassemblyNotes: '',
+                        operatorLog: []
+                    },
+                    machineShop: { 
+                        start: null, 
+                        end: null, 
+                        operator: null,
+                        cuttingDetails: '',
+                        workDone: '',
+                        operatorLog: []
+                    },
+                    reassembly: { 
+                        start: null, 
+                        end: null, 
+                        operator: null,
+                        assemblyNotes: '',
+                        operatorLog: []
+                    },
+                    alignment: { 
+                        start: null, 
+                        end: null, 
+                        operator: null,
+                        alignmentNotes: '',
+                        operatorLog: []
+                    }
+                }
+            };
+            
+            pumps.push(newPump);
+            updatePumpTable();
+            updateStats();
+            clearForm();
+            
+            // Show success notification
+            showNotification('Pump added successfully!', 'success');
+        }
+        
+        // Clear the form after submission
+        function clearForm() {
+            document.getElementById('pump-id').value = '';
+            document.getElementById('pump-type').value = '';
+            document.getElementById('received-time').value = '';
+            document.getElementById('received-by').value = '';
+        }
+        
+        // Update the pump tracking table
+        function updatePumpTable() {
+            const tableBody = document.getElementById('pump-data');
+            tableBody.innerHTML = '';
+            
+            pumps.forEach((pump, index) => {
+                const row = document.createElement('tr');
+                if (window.innerWidth <= 768) {
+                    row.className = 'mobile-row';
+                }
+                
+                // Calculate time taken at current stage
+                let timeTaken = 'In progress';
+                if (pump.currentStage !== 'Completed') {
+                    const diff = Math.floor((new Date() - pump.stageStartTime) / 60000);
+                    timeTaken = diff > 60 ? Math.floor(diff / 60) + ' hrs ' + (diff % 60) + ' mins' : diff + ' mins';
+                }
+                
+                // Determine status class
+                let statusClass = 'status-pending';
+                if (pump.currentStage === 'Completed') {
+                    statusClass = 'status-completed';
+                } else if (pump.currentStage === 'Loading Point') {
+                    statusClass = 'status-loading';
+                }
+                
+                row.innerHTML = `
+                    <td data-label="Pump ID"><strong>${pump.id}</strong></td>
+                    <td data-label="Type">${pump.type}</td>
+                    <td data-label="Status"><span class="status-badge ${statusClass}">
+                        <i class="fas ${pump.currentStage === 'Completed' ? 'fa-check-circle' : 'fa-spinner'}"></i>
+                        ${pump.currentStage}
+                    </span></td>
+                    <td data-label="Stage Start">${formatDate(pump.stageStartTime)}</td>
+                    <td data-label="Time Taken">${timeTaken}</td>
+                    <td data-label="Actions" class="action-btns">
+                        ${pump.currentStage !== 'Completed' ? 
+                          `<button class="btn btn-success" onclick="showStageForm(${index})">
+                            <i class="fas fa-arrow-right"></i>
+                            Update
+                          </button>` : ''}
+                        <button class="btn btn-warning" onclick="showPumpDetails(${index})">
+                            <i class="fas fa-eye"></i>
+                            View
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Format date for display
+        function formatDate(date) {
+            if (!date) return 'N/A';
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Get next stage in process
+        function getNextStage(currentStage) {
+            const stages = [
+                'Loading Point',
+                'Dismantling',
+                'Machine Shop',
+                'Reassembly',
+                'Alignment',
+                'Completed'
+            ];
+            
+            const currentIndex = stages.indexOf(currentStage);
+            return stages[currentIndex + 1] || 'Completed';
+        }
+        
+        // Show form for stage update
+        function showStageForm(index) {
+            currentPumpIndex = index;
+            const pump = pumps[index];
+            const nextStage = getNextStage(pump.currentStage);
+            
+            let formHtml = `
+                <div class="stage-form">
+                    <h3>Update to ${nextStage}</h3>
+                    <div class="form-row">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i>
+                            Operator Name:
+                        </label>
+                        <input type="text" class="form-control" id="operator-name" placeholder="Your name">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">
+                            <i class="fas fa-clipboard"></i>
+                            Work Notes:
+                        </label>
+                        <textarea class="form-control" id="work-notes" placeholder="Describe work done"></textarea>
+                    </div>`;
+            
+            // Special fields for Dismantling stage
+            if (nextStage === 'Dismantling') {
+                formHtml += `
+                    <div class="parts-checklist">
+                        <p><i class="fas fa-cut"></i> Parts requiring cutting:</p>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="cut-impeller" name="cut-parts" value="Impeller">
+                            <label for="cut-impeller">Impeller</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="cut-sleeve" name="cut-parts" value="Sleeve">
+                            <label for="cut-sleeve">Sleeve</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="cut-stuffing" name="cut-parts" value="Stuffing Box">
+                            <label for="cut-stuffing">Stuffing Box</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="cut-collar" name="cut-parts" value="Collar">
+                            <label for="cut-collar">Collar</label>
+                        </div>
+                    </div>`;
+            }
+            
+            // Special fields for Machine Shop stage
+            if (nextStage === 'Machine Shop') {
+                formHtml += `
+                    <div class="form-row">
+                        <label class="form-label">
+                            <i class="fas fa-cut"></i>
+                            Cutting Details:
+                        </label>
+                        <textarea class="form-control" id="cutting-details" placeholder="Describe cutting work done">${pump.stages.dismantling.partsToCut.join(', ')}</textarea>
+                    </div>`;
+            }
+            
+            // Special fields for Reassembly stage
+            if (nextStage === 'Reassembly') {
+                formHtml += `
+                    <div class="form-row">
+                        <label class="form-label">
+                            <i class="fas fa-cogs"></i>
+                            Assembly Notes:
+                        </label>
+                        <textarea class="form-control" id="work-notes" placeholder="Describe reassembly process"></textarea>
+                    </div>`;
+            }
+            
+            formHtml += `
+                    <div class="form-row">
+                        <div style="width: 220px;"></div>
+                        <button class="btn btn-primary" onclick="updatePumpStage()">
+                            <i class="fas fa-save"></i>
+                            Confirm Update
+                        </button>
+                    </div>
+                </div>`;
+            
+            document.getElementById('modal-title').innerHTML = `
+                <i class="fas fa-arrow-right"></i>
+                Update to ${nextStage}
+            `;
+            document.getElementById('modal-content').innerHTML = formHtml;
+            openModal();
+        }
+        
+        // Update pump to next stage
+        function updatePumpStage() {
+            const pump = pumps[currentPumpIndex];
+            const nextStage = getNextStage(pump.currentStage);
+            const operatorName = document.getElementById('operator-name').value;
+            const workNotes = document.getElementById('work-notes').value;
+            
+            if (!operatorName) {
+                alert('Please enter operator name');
+                return;
+            }
+            
+            const now = new Date();
+            
+            // Record end time for current stage
+            if (pump.currentStage === 'Loading Point') {
+                pump.stages.loading.end = now;
+                pump.stages.loading.notes = workNotes || 'No notes provided';
+            } 
+            else if (pump.currentStage === 'Dismantling') {
+                pump.stages.dismantling.end = now;
+                pump.stages.dismantling.disassemblyNotes = workNotes || 'No disassembly notes';
+                
+                const checkboxes = document.querySelectorAll('input[name="cut-parts"]:checked');
+                pump.stages.dismantling.partsToCut = Array.from(checkboxes).map(cb => cb.value);
+                
+                pump.stages.dismantling.operatorLog.push({
+                    timestamp: now,
+                    operator: operatorName,
+                    action: 'Completed dismantling',
+                    details: `Parts to cut: ${pump.stages.dismantling.partsToCut.join(', ')}`
+                });
+            } 
+            else if (pump.currentStage === 'Machine Shop') {
+                pump.stages.machineShop.end = now;
+                pump.stages.machineShop.cuttingDetails = document.getElementById('cutting-details').value;
+                pump.stages.machineShop.workDone = workNotes || 'No work details provided';
+                
+                pump.stages.machineShop.operatorLog.push({
+                    timestamp: now,
+                    operator: operatorName,
+                    action: 'Completed machining',
+                    details: pump.stages.machineShop.workDone
+                });
+            } 
+            else if (pump.currentStage === 'Reassembly') {
+                pump.stages.reassembly.end = now;
+                pump.stages.reassembly.assemblyNotes = workNotes || 'No assembly notes';
+                pump.stages.reassembly.operator = operatorName;
+                
+                pump.stages.reassembly.operatorLog.push({
+                    timestamp: now,
+                    operator: operatorName,
+                    action: 'Completed reassembly',
+                    details: pump.stages.reassembly.assemblyNotes
+                });
+            }
+            else if (pump.currentStage === 'Alignment') {
+                pump.stages.alignment.end = now;
+                pump.stages.alignment.alignmentNotes = workNotes || 'No alignment notes';
+                
+                pump.stages.alignment.operatorLog.push({
+                    timestamp: now,
+                    operator: operatorName,
+                    action: 'Completed alignment',
+                    details: pump.stages.alignment.alignmentNotes
+                });
+            }
+            
+            if (nextStage === 'Dismantling') {
+                pump.stages.dismantling.start = now;
+                pump.stages.dismantling.operator = operatorName;
+                
+                pump.stages.dismantling.operatorLog.push({
+                    timestamp: now,
+                    operator: operatorName,
+                    action: 'Started dismantling',
+                    details: workNotes || 'No notes provided'
+                });
+            } 
+            else if (nextStage === 'Machine Shop') {
+                pump.stages.machineShop.start = now;
+                pump.stages.machineShop.operator = operatorName;
+                
+                pump.stages.machineShop.operatorLog.push({
+                    timestamp: now,
+                    operator: operatorName,
+                    action: 'Started machining',
+                    details: workNotes || 'No notes provided'
+                });
+            }
+            else if (nextStage === 'Reassembly') {
+                pump.stages.reassembly.start = now;
+                pump.stages.reassembly.operator = operatorName;
+                
+                pump.stages.reassembly.operatorLog.push({
+                    timestamp: now,
+                    operator: operatorName,
+                    action: 'Started reassembly',
+                    details: workNotes || 'No notes provided'
+                });
+            }
+            else if (nextStage === 'Alignment') {
+                pump.stages.alignment.start = now;
+                pump.stages.alignment.operator = operatorName;
+                
+                pump.stages.alignment.operatorLog.push({
+                    timestamp: now,
+                    operator: operatorName,
+                    action: 'Started alignment',
+                    details: workNotes || 'No notes provided'
+                });
+            }
+            
+            // Update pump status
+            pump.currentStage = nextStage;
+            pump.stageStartTime = now;
+            
+            closeModal();
+            updatePumpTable();
+            updateStats();
+            updateProgressBar();
+            
+            // Show success notification
+            showNotification(`Pump ${pump.id} moved to ${nextStage}`, 'success');
+        }
+        
+        // Show detailed pump information
+        function showPumpDetails(index) {
+            const pump = pumps[index];
+            
+            // Determine status class
+            let statusClass = 'status-pending';
+            if (pump.currentStage === 'Completed') {
+                statusClass = 'status-completed';
+            } else if (pump.currentStage === 'Loading Point') {
+                statusClass = 'status-loading';
+            }
+            
+            let detailsHtml = `
+                <div class="pump-header">
+                    <h3>Pump ${pump.id} - ${pump.type}</h3>
+                    <p><strong>Current Status:</strong> <span class="status-badge ${statusClass}">
+                        <i class="fas ${pump.currentStage === 'Completed' ? 'fa-check-circle' : 'fa-spinner'}"></i>
+                        ${pump.currentStage}
+                    </span></p>
+                    <p><i class="fas fa-calendar-alt"></i> <strong>Received At:</strong> ${formatDate(pump.receivedAt)} by ${pump.receivedBy}</p>
+                </div>
+                
+                <h4><i class="fas fa-list-ol"></i> Processing Stages:</h4>
+                <div class="stage-details">
+                    <div class="stage-card">
+                        <h5><i class="fas fa-truck-loading"></i> 1. Loading Point</h5>
+                        <p><strong>Time:</strong> ${formatDate(pump.stages.loading.start)} - ${formatDate(pump.stages.loading.end) || 'In progress'}</p>
+                        <p><strong>Operator:</strong> ${pump.stages.loading.operator}</p>
+                        <p><strong>Notes:</strong> ${pump.stages.loading.notes}</p>
+                    </div>`;
+            
+            if (pump.stages.dismantling.start) {
+                detailsHtml += `
+                    <div class="stage-card">
+                        <h5><i class="fas fa-cut"></i> 2. Dismantling</h5>
+                        <p><strong>Time:</strong> ${formatDate(pump.stages.dismantling.start)} - ${formatDate(pump.stages.dismantling.end) || 'In progress'}</p>
+                        <p><strong>Operator:</strong> ${pump.stages.dismantling.operator}</p>
+                        <p><strong>Parts to cut:</strong> ${pump.stages.dismantling.partsToCut.join(', ') || 'None'}</p>
+                        <p><strong>Notes:</strong> ${pump.stages.dismantling.disassemblyNotes}</p>
+                    </div>`;
+            }
+            
+            if (pump.stages.machineShop.start) {
+                detailsHtml += `
+                    <div class="stage-card">
+                        <h5><i class="fas fa-tools"></i> 3. Machine Shop</h5>
+                        <p><strong>Time:</strong> ${formatDate(pump.stages.machineShop.start)} - ${formatDate(pump.stages.machineShop.end) || 'In progress'}</p>
+                        <p><strong>Operator:</strong> ${pump.stages.machineShop.operator}</p>
+                        <p><strong>Cutting Details:</strong> ${pump.stages.machineShop.cuttingDetails}</p>
+                        <p><strong>Work Done:</strong> ${pump.stages.machineShop.workDone}</p>
+                    </div>`;
+            }
+            
+            if (pump.stages.reassembly.start) {
+                detailsHtml += `
+                    <div class="stage-card">
+                        <h5><i class="fas fa-cogs"></i> 4. Reassembly</h5>
+                        <p><strong>Time:</strong> ${formatDate(pump.stages.reassembly.start)} - ${formatDate(pump.stages.reassembly.end) || 'In progress'}</p>
+                        <p><strong>Operator:</strong> ${pump.stages.reassembly.operator}</p>
+                        <p><strong>Notes:</strong> ${pump.stages.reassembly.assemblyNotes}</p>
+                    </div>`;
+            }
+            
+            if (pump.stages.alignment.start) {
+                detailsHtml += `
+                    <div class="stage-card">
+                        <h5><i class="fas fa-ruler-combined"></i> 5. Alignment</h5>
+                        <p><strong>Time:</strong> ${formatDate(pump.stages.alignment.start)} - ${formatDate(pump.stages.alignment.end) || 'In progress'}</p>
+                        <p><strong>Operator:</strong> ${pump.stages.alignment.operator}</p>
+                        <p><strong>Notes:</strong> ${pump.stages.alignment.alignmentNotes}</p>
+                    </div>`;
+            }
+            
+            // Add operator logs
+            detailsHtml += `
+                <h4><i class="fas fa-clipboard-list"></i> Operator Logs:</h4>
+                <div class="operator-log">`;
+            
+            // Combine all operator logs from all stages
+            let allLogs = [];
+            Object.values(pump.stages).forEach(stage => {
+                if (stage.operatorLog) {
+                    allLogs = allLogs.concat(stage.operatorLog);
+                }
+            });
+            
+            // Sort logs by timestamp
+            allLogs.sort((a, b) => a.timestamp - b.timestamp);
+            
+            if (allLogs.length === 0) {
+                detailsHtml += `<div class="log-entry"><p>No operator logs available</p></div>`;
+            } else {
+                allLogs.forEach(log => {
+                    detailsHtml += `
+                        <div class="log-entry">
+                            <div class="log-header">
+                                <strong>${formatDate(log.timestamp)}</strong>
+                                <span class="badge badge-primary">${log.operator}</span>
+                            </div>
+                            <p><strong>${log.action}:</strong> ${log.details}</p>
+                        </div>`;
+                });
+            }
+            
+            detailsHtml += `</div></div>`;
+            
+            document.getElementById('modal-title').innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                Pump ${pump.id} Details
+            `;
+            document.getElementById('modal-content').innerHTML = detailsHtml;
+            openModal();
+        }
+        
+        // Generate reports
+        function generateReport() {
+            const date = document.getElementById('report-date').value;
+            if (!date) {
+                showNotification('Please select a date', 'warning');
+                return;
+            }
+            
+            const selectedDate = new Date(date);
+            const filteredPumps = pumps.filter(pump => {
+                return new Date(pump.receivedAt).toDateString() === selectedDate.toDateString();
+            });
+            
+            let reportHtml = `
+                <div class="report-header">
+                    <h3><i class="fas fa-file-alt"></i> Report for ${selectedDate.toDateString()}</h3>
+                    <p>Total Pumps: ${filteredPumps.length}</p>
+                </div>`;
+            
+            if (filteredPumps.length === 0) {
+                reportHtml += `<div class="empty-state"><p>No pumps processed on this date</p></div>`;
+            } else {
+                // Calculate summary statistics
+                const completedPumps = filteredPumps.filter(p => p.currentStage === 'Completed').length;
+                const inProgressPumps = filteredPumps.length - completedPumps;
+                
+                reportHtml += `
+                    <div class="report-summary">
+                        <div class="summary-card">
+                            <h4><i class="fas fa-check-circle"></i> Completed</h4>
+                            <p>${completedPumps} pumps (${Math.round((completedPumps / filteredPumps.length) * 100)}%)</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4><i class="fas fa-spinner"></i> In Progress</h4>
+                            <p>${inProgressPumps} pumps (${Math.round((inProgressPumps / filteredPumps.length) * 100)}%)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Pump ID</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Current Stage</th>
+                                    <th>Time in System</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                filteredPumps.forEach(pump => {
+                    const timeInSystem = pump.currentStage === 'Completed' 
+                        ? formatTimeDifference(pump.stages.alignment.end - pump.receivedAt)
+                        : 'Still in progress';
+                    
+                    // Determine status class
+                    let statusClass = 'status-pending';
+                    if (pump.currentStage === 'Completed') {
+                        statusClass = 'status-completed';
+                    } else if (pump.currentStage === 'Loading Point') {
+                        statusClass = 'status-loading';
+                    }
+                    
+                    reportHtml += `
+                        <tr>
+                            <td>${pump.id}</td>
+                            <td>${pump.type}</td>
+                            <td><span class="status-badge ${statusClass}">
+                                <i class="fas ${pump.currentStage === 'Completed' ? 'fa-check-circle' : 'fa-spinner'}"></i>
+                                ${pump.currentStage}
+                            </span></td>
+                            <td>${pump.currentStage}</td>
+                            <td>${timeInSystem}</td>
+                        </tr>`;
+                });
+                
+                reportHtml += `</tbody></table></div>`;
+            }
+            
+            document.getElementById('report-results').innerHTML = reportHtml;
+            showNotification('Report generated successfully', 'success');
+        }
+        
+        // Load supervisor view
+        function loadSupervisorView() {
+            const date = document.getElementById('supervisor-date').value;
+            if (!date) {
+                showNotification('Please select a date', 'warning');
+                return;
+            }
+            
+            const selectedDate = new Date(date);
+            const filteredPumps = pumps.filter(pump => {
+                return new Date(pump.receivedAt).toDateString() === selectedDate.toDateString();
+            });
+            
+            let supervisorHtml = `
+                <div class="supervisor-header">
+                    <h3><i class="fas fa-user-shield"></i> Supervisor Report for ${selectedDate.toDateString()}</h3>
+                    <p>Total Pumps: ${filteredPumps.length}</p>
+                </div>`;
+            
+            if (filteredPumps.length === 0) {
+                supervisorHtml += `<div class="empty-state"><p>No pumps processed on this date</p></div>`;
+            } else {
+                filteredPumps.forEach((pump, index) => {
+                    // Determine status class
+                    let statusClass = 'status-pending';
+                    if (pump.currentStage === 'Completed') {
+                        statusClass = 'status-completed';
+                    } else if (pump.currentStage === 'Loading Point') {
+                        statusClass = 'status-loading';
+                    }
+                    
+                    supervisorHtml += `
+                        <div class="pump-supervisor-card">
+                            <div class="pump-header">
+                                <h4>Pump ${pump.id} - ${pump.type}</h4>
+                                <span class="status-badge ${statusClass}">
+                                    <i class="fas ${pump.currentStage === 'Completed' ? 'fa-check-circle' : 'fa-spinner'}"></i>
+                                    ${pump.currentStage}
+                                </span>
+                            </div>
+                            
+                            <div class="time-info">
+                                <p><i class="fas fa-clock"></i> <strong>Time in System:</strong> 
+                                    ${pump.currentStage === 'Completed' 
+                                        ? formatTimeDifference(pump.stages.alignment.end - pump.receivedAt)
+                                        : 'Still in progress'}
+                                </p>
+                            </div>
+                            
+                            <h5><i class="fas fa-clipboard-list"></i> Operator Logs:</h5>`;
+                    
+                    // Combine all operator logs from all stages
+                    let allLogs = [];
+                    Object.values(pump.stages).forEach(stage => {
+                        if (stage.operatorLog) {
+                            allLogs = allLogs.concat(stage.operatorLog);
+                        }
+                    });
+                    
+                    // Sort logs by timestamp
+                    allLogs.sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    if (allLogs.length === 0) {
+                        supervisorHtml += `<div class="empty-state"><p>No operator logs available</p></div>`;
+                    } else {
+                        supervisorHtml += `<div class="operator-log">`;
+                        allLogs.forEach(log => {
+                            supervisorHtml += `
+                                <div class="log-entry">
+                                    <div class="log-header">
+                                        <strong>${formatDate(log.timestamp)}</strong>
+                                        <span class="badge badge-primary">${log.operator}</span>
+                                    </div>
+                                    <p><strong>${log.action}:</strong> ${log.details}</p>
+                                </div>`;
+                        });
+                        supervisorHtml += `</div>`;
+                    }
+                    
+                    supervisorHtml += `</div>`;
+                    
+                    // Add separator if not last pump
+                    if (index < filteredPumps.length - 1) {
+                        supervisorHtml += `<hr class="divider">`;
+                    }
+                });
+            }
+            
+            document.getElementById('supervisor-results').innerHTML = supervisorHtml;
+            showNotification('Supervisor data loaded', 'success');
+        }
+        
+        // Search pumps
+        function searchPumps() {
+            const searchTerm = document.getElementById('search-pump').value.toLowerCase();
+            if (!searchTerm) {
+                updatePumpTable();
+                return;
+            }
+            
+            const filteredPumps = pumps.filter(pump => 
+                pump.id.toLowerCase().includes(searchTerm) || 
+                pump.type.toLowerCase().includes(searchTerm)
+            );
+            
+            const tableBody = document.getElementById('pump-data');
+            tableBody.innerHTML = '';
+            
+            filteredPumps.forEach((pump, index) => {
+                const row = document.createElement('tr');
+                if (window.innerWidth <= 768) {
+                    row.className = 'mobile-row';
+                }
+                
+                // Calculate time taken at current stage
+                let timeTaken = 'In progress';
+                if (pump.currentStage !== 'Completed') {
+                    const diff = Math.floor((new Date() - pump.stageStartTime) / 60000);
+                    timeTaken = diff > 60 ? Math.floor(diff / 60) + ' hrs ' + (diff % 60) + ' mins' : diff + ' mins';
+                }
+                
+                // Determine status class
+                let statusClass = 'status-pending';
+                if (pump.currentStage === 'Completed') {
+                    statusClass = 'status-completed';
+                } else if (pump.currentStage === 'Loading Point') {
+                    statusClass = 'status-loading';
+                }
+                
+                row.innerHTML = `
+                    <td data-label="Pump ID"><strong>${pump.id}</strong></td>
+                    <td data-label="Type">${pump.type}</td>
+                    <td data-label="Status"><span class="status-badge ${statusClass}">
+                        <i class="fas ${pump.currentStage === 'Completed' ? 'fa-check-circle' : 'fa-spinner'}"></i>
+                        ${pump.currentStage}
+                    </span></td>
+                    <td data-label="Stage Start">${formatDate(pump.stageStartTime)}</td>
+                    <td data-label="Time Taken">${timeTaken}</td>
+                    <td data-label="Actions" class="action-btns">
+                        ${pump.currentStage !== 'Completed' ? 
+                          `<button class="btn btn-success" onclick="showStageForm(${index})">
+                            <i class="fas fa-arrow-right"></i>
+                            Update
+                          </button>` : ''}
+                        <button class="btn btn-warning" onclick="showPumpDetails(${index})">
+                            <i class="fas fa-eye"></i>
+                            View
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Update statistics
+        function updateStats() {
+            document.getElementById('total-pumps').textContent = pumps.length;
+            
+            const completedPumps = pumps.filter(p => p.currentStage === 'Completed').length;
+            document.getElementById('completed-pumps').textContent = completedPumps;
+            
+            const inProgress = pumps.length - completedPumps;
+            document.getElementById('in-progress').textContent = inProgress;
+            
+            // Calculate average time for completed pumps
+            let avgTime = 0;
+            if (completedPumps > 0) {
+                const totalTime = pumps.reduce((sum, pump) => {
+                    if (pump.currentStage === 'Completed') {
+                        return sum + (pump.stages.alignment.end - pump.receivedAt);
+                    }
+                    return sum;
+                }, 0);
+                avgTime = Math.round((totalTime / completedPumps) / 3600000);
+            }
+            document.getElementById('avg-time').textContent = avgTime;
+        }
+        
+        // Update progress bar
+        function updateProgressBar() {
+            if (pumps.length === 0) {
+                document.getElementById('progress-fill').style.width = '0%';
+                return;
+            }
+            
+            const completedPumps = pumps.filter(p => p.currentStage === 'Completed').length;
+            const progress = (completedPumps / pumps.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+        
+        // Format time difference
+        function formatTimeDifference(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) {
+                return `${days}d ${hours % 24}h`;
+            } else if (hours > 0) {
+                return `${hours}h ${minutes % 60}m`;
+            } else if (minutes > 0) {
+                return `${minutes}m ${seconds % 60}s`;
+            } else {
+                return `${seconds}s`;
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Initialize with some sample data
+        function initializeSampleData() {
+            const now = new Date();
+            const samplePump1 = {
+                id: "PUMP-001",
+                type: "Centrifugal 100HP",
+                receivedAt: new Date(now.getTime() - 86400000),
+                currentStage: "Completed",
+                stageStartTime: new Date(now.getTime() - 3600000),
+                receivedBy: "John Doe",
+                stages: {
+                    loading: { 
+                        start: new Date(now.getTime() - 86400000), 
+                        end: new Date(now.getTime() - 82800000),
+                        operator: "John Doe",
+                        notes: 'Pump received at loading point'
+                    },
+                    dismantling: { 
+                        start: new Date(now.getTime() - 82800000),
+                        end: new Date(now.getTime() - 75600000),
+                        operator: "Mike Smith",
+                        partsToCut: ["Impeller", "Sleeve"],
+                        disassemblyNotes: 'Standard disassembly process',
+                        operatorLog: [
+                            {
+                                timestamp: new Date(now.getTime() - 82800000),
+                                operator: "Mike Smith",
+                                action: "Started dismantling",
+                                details: "Initial inspection"
+                            },
+                            {
+                                timestamp: new Date(now.getTime() - 75600000),
+                                operator: "Mike Smith",
+                                action: "Completed dismantling",
+                                details: "Parts to cut: Impeller, Sleeve"
+                            }
+                        ]
+                    },
+                    machineShop: { 
+                        start: new Date(now.getTime() - 75600000),
+                        end: new Date(now.getTime() - 61200000),
+                        operator: "Sarah Johnson",
+                        cuttingDetails: "Impeller and sleeve required cutting",
+                        workDone: "Machined all required parts",
+                        operatorLog: [
+                            {
+                                timestamp: new Date(now.getTime() - 75600000),
+                                operator: "Sarah Johnson",
+                                action: "Started machining",
+                                details: "Received parts for cutting"
+                            },
+                            {
+                                timestamp: new Date(now.getTime() - 61200000),
+                                operator: "Sarah Johnson",
+                                action: "Completed machining",
+                                details: "Machined all required parts"
+                            }
+                        ]
+                    },
+                    reassembly: { 
+                        start: new Date(now.getTime() - 61200000),
+                        end: new Date(now.getTime() - 46800000),
+                        operator: "Robert Brown",
+                        assemblyNotes: "Standard reassembly process",
+                        operatorLog: [
+                            {
+                                timestamp: new Date(now.getTime() - 61200000),
+                                operator: "Robert Brown",
+                                action: "Started reassembly",
+                                details: "Beginning reassembly"
+                            },
+                            {
+                                timestamp: new Date(now.getTime() - 46800000),
+                                operator: "Robert Brown",
+                                action: "Completed reassembly",
+                                details: "Standard reassembly process"
+                            }
+                        ]
+                    },
+                    alignment: { 
+                        start: new Date(now.getTime() - 46800000),
+                        end: new Date(now.getTime() - 3600000),
+                        operator: "David Wilson",
+                        alignmentNotes: "Precision alignment completed",
+                        operatorLog: [
+                            {
+                                timestamp: new Date(now.getTime() - 46800000),
+                                operator: "David Wilson",
+                                action: "Started alignment",
+                                details: "Beginning alignment process"
+                            },
+                            {
+                                timestamp: new Date(now.getTime() - 3600000),
+                                operator: "David Wilson",
+                                action: "Completed alignment",
+                                details: "Precision alignment completed"
+                            }
+                        ]
+                    }
+                }
+            };
+            
+            const samplePump2 = {
+                id: "PUMP-002",
+                type: "Submersible 50HP",
+                receivedAt: new Date(now.getTime() - 43200000),
+                currentStage: "Machine Shop",
+                stageStartTime: new Date(now.getTime() - 14400000),
+                receivedBy: "Jane Smith",
+                stages: {
+                    loading: { 
+                        start: new Date(now.getTime() - 43200000), 
+                        end: new Date(now.getTime() - 36000000),
+                        operator: "Jane Smith",
+                        notes: 'Pump received with minor damage'
+                    },
+                    dismantling: { 
+                        start: new Date(now.getTime() - 36000000),
+                        end: new Date(now.getTime() - 21600000),
+                        operator: "Mike Smith",
+                        partsToCut: ["Impeller"],
+                        disassemblyNotes: 'Required extra care due to corrosion',
+                        operatorLog: [
+                            {
+                                timestamp: new Date(now.getTime() - 36000000),
+                                operator: "Mike Smith",
+                                action: "Started dismantling",
+                                details: "Initial inspection noted corrosion"
+                            },
+                            {
+                                timestamp: new Date(now.getTime() - 21600000),
+                                operator: "Mike Smith",
+                                action: "Completed dismantling",
+                                details: "Parts to cut: Impeller"
+                            }
+                        ]
+                    },
+                    machineShop: { 
+                        start: new Date(now.getTime() - 21600000),
+                        end: null,
+                        operator: "Sarah Johnson",
+                        cuttingDetails: "Impeller requires cutting",
+                        workDone: "In progress",
+                        operatorLog: [
+                            {
+                                timestamp: new Date(now.getTime() - 21600000),
+                                operator: "Sarah Johnson",
+                                action: "Started machining",
+                                details: "Received impeller for cutting"
+                            }
+                        ]
+                    },
+                    reassembly: { 
+                        start: null,
+                        end: null,
+                        operator: null,
+                        assemblyNotes: '',
+                        operatorLog: []
+                    },
+                    alignment: { 
+                        start: null,
+                        end: null,
+                        operator: null,
+                        alignmentNotes: '',
+                        operatorLog: []
+                    }
+                }
+            };
+            
+            pumps.push(samplePump1, samplePump2);
+            updatePumpTable();
+            updateStats();
+            updateProgressBar();
+        }
+        
+        // Initialize when page loads
+        window.onload = function() {
+            initializeSampleData();
+            
+            // Set today's date as default in date inputs
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('report-date').value = today;
+            document.getElementById('supervisor-date').value = today;
+            
+            // Add event listener for Enter key in search
+            document.getElementById('search-pump').addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    searchPumps();
+                }
+            });
+
+            // Handle initial resize for mobile responsiveness
+            if (window.innerWidth <= 768) {
+                document.getElementById('pump-table').classList.add('mobile-table');
+            }
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('pump-table').classList.add('mobile-table');
+                } else {
+                    document.getElementById('pump-table').classList.remove('mobile-table');
+                }
+            });
+        };
+    </script>
+</body>
+</html>
